@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flood Risk Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* VARIABLES REFINADAS para un look más profesional */
+    :root{
+      --brand:#117161; /* Verde */
+      --accent-1:#d00000; /* Rojo/High */
+      --accent-2:#ffb703; /* Amarillo/Medium */
+      --accent-3:#8ecae6; /* Azul/Low */
+      
+      --bg:#f9fbfb;
+      --bg-soft:#f0f5f5;
+      --ink:#1a1c1d;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --shadow:0 4px 12px rgba(0,0,0,.06);
+      
+      --radius:12px;
+    }
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px}
+    .app-bg{background:
+      radial-gradient(circle at 10% 5%, var(--bg-soft) 0, transparent 20%),
+      radial-gradient(circle at 90% 0%, var(--bg-soft) 0, transparent 30%)
+    }
+    header{
+      position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.8);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center}
+    .title{font-weight:700;font-size:22px;color:var(--brand)}
+    .badge{background:var(--brand);color:#fff;border-radius:999px;padding:2px 10px;font-size:12px;margin-left:8px;font-weight:600}
+    .grow{flex:1}
+    .btn{
+      border:1px solid var(--border);background:#fff;border-radius:8px;padding:8px 12px;font-weight:500;cursor:pointer;
+      transition:background 0.2s, border-color 0.2s;
+    }
+    .btn.primary{background:var(--brand);color:#fff;border-color:transparent}
+    .btn.primary:hover{background:#0e5a4d}
+    .btn.ghost{background:transparent;border-color:transparent}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .input, select{height:38px;border:1px solid var(--border);border-radius:8px;padding:0 10px;background:#fff}
+    .switch{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+
+    main{max-width:1200px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:2.2fr 1fr;gap:24px}
+    @media (max-width: 960px){ main{grid-template-columns:1fr;gap:16px} }
+
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .card h3{margin:0;padding:14px;border-bottom:1px solid var(--border);font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px}
+    .card .content{padding:14px}
+    
+    /* Map */
+    #map{width:100%;height:480px;border-radius:0 0 var(--radius) var(--radius)}
+    /* Leyenda mejorada */
+    .legend{
+      position:absolute; right:12px; top:12px; z-index:400; background:#fff; 
+      border:1px solid var(--border); border-radius:8px; padding:10px; font-size:13px; box-shadow:0 1px 4px rgba(0,0,0,.1);
+    }
+    .legend div{display:flex;align-items:center;margin-bottom:4px}
+    .dot{width:12px;height:12px;border-radius:999px;display:inline-block;margin-right:8px}
+
+    /* KPI */
+    .kpis{display:grid;grid-template-columns:repeat(3, 1fr);gap:16px}
+    @media (max-width: 520px){ .kpis{grid-template-columns:1fr} }
+    .kpi .big{font-size:28px;font-weight:700;margin-top:2px}
+    .kpi .muted{font-size:13px;color:var(--muted)}
+
+    /* Alerts list */
+    .notif{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+    .notif:last-child{border-bottom:none;padding-bottom:0}
+    .chip{border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;line-height:1}
+    .chip.high{background:var(--accent-1);color:#fff;}
+    .chip.medium{background:#fef3c7;color:#92400e;}
+    .chip.low{background:#eff6ff;color:#1e40af;}
+    
+    /* Table */
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th{font-weight:600}
+    th,td{border-bottom:1px solid var(--border);padding:10px 8px;text-align:left}
+    tbody tr:hover{background:#f9fafb}
+    
+    /* Dialog */
+    dialog{border:none;border-radius:16px;width:min(520px,90%);padding:20px;}
+    dialog::backdrop{background:rgba(0,0,0,.4)}
+    dialog h3{font-size:18px;margin-bottom:12px}
+  </style>
+</head>
+<body class="app-bg">
+  <header>
+    <div class="wrap">
+      <div class="title">Flood Risk Dashboard</div>
+      <span class="badge">Beta</span>
+      <div class="grow"></div>
+      <input id="from" class="input" type="date" title="Fecha de inicio"/>
+      <span style="color:var(--muted)">→</span>
+      <input id="to" class="input" type="date" title="Fecha de fin"/>
+      <select id="aoi" title="Área de Interés">
+        <option value="Default">Default (Todas las AOI)</option>
+        <option value="AOI1">AOI1</option>
+        <option value="AOI2">AOI2</option>
+        <option value="AOI3">AOI3</option>
+        <option value="AOI4">AOI4</option>
+        <option value="AOI5">AOI5</option>
+        <option value="AOI6">AOI6</option>
+        <option value="AOI7">AOI7</option>
+        <option value="AOI8">AOI8</option>
+        <option value="AOI9">AOI9</option>
+        <option value="AOI10">AOI10</option>
+      </select>
+      <button id="refresh" class="btn primary">Actualizar</button>
+      <label class="switch"><input id="live" type="checkbox" checked/> Live</label>
+      <button id="settingsBtn" class="btn ghost">Config</button>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="card" style="position:relative;overflow:hidden">
+        <h3>Mapa de Eventos de Inundación</h3>
+        <div class="content" style="padding:0">
+          <div id="map">
+             <div class="legend" id="mapLegend">
+                <div style="font-weight:600;margin-bottom:6px">Severidad</div>
+                <div><span class="dot" style="background:var(--accent-1);opacity:.6"></span> Alto</div>
+                <div><span class="dot" style="background:var(--accent-2);opacity:.6"></span> Medio</div>
+                <div><span class="dot" style="background:var(--accent-3);opacity:.6"></span> Bajo</div>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px">
+        <h3>Lluvia & Riesgo de Inundación (14 días)</h3>
+        <div class="content">
+          <canvas id="tsChart" height="180"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <aside class="right-panel">
+      <div class="card">
+        <h3>Indicadores Clave de Impacto (KPIs)</h3>
+        <div class="content">
+          <div class="kpis">
+            <div class="kpi" aria-label="Área total inundada">
+              <div class="muted">Área inundada (Total)</div>
+              <div id="kpiArea" class="big" style="color:var(--accent-1)">—</div>
+            </div>
+            <div class="kpi" aria-label="Población total afectada">
+              <div class="muted">Población afectada</div>
+              <div id="kpiPeople" class="big" style="color:var(--brand)">—</div>
+            </div>
+            <div class="kpi" aria-label="Conteo de alertas por severidad: Alto, Medio, Bajo">
+              <div class="muted">Alertas (A/M/B)</div>
+              <div id="kpiCounts" class="big">—</div>
+            </div>
+          </div>
+          <div class="muted" style="margin-top:12px;font-size:12px">Última actualización: <span id="lastUpdate">—</span> <button id="exportCsv" class="btn ghost" style="padding:4px 8px;margin-left:8px">Exportar CSV</button></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px">
+        <h3>Notificaciones Recientes</h3>
+        <div id="notifList" class="content" style="display:grid;gap:4px"></div>
+      </div>
+    </aside>
+
+    <section style="grid-column:1/-1">
+      <div class="card">
+        <h3>Detalle de Alertas Detectadas</h3>
+        <div class="content" style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Fecha/Hora</th><th>AOI</th><th>Severidad</th><th>Área (km²)</th><th>Población</th><th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="alertsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="settings">
+    <form method="dialog" class="content" id="settingsForm">
+      <h3 style="border:none;padding:0;margin:0 0 10px 0">Configuración del Panel</h3>
+      <label style="display:block;font-size:12px;color:var(--muted)">Endpoint de alertas</label>
+      <input id="endpoint" name="endpoint" class="input" placeholder="https://api.tu-backend/alerts" value="/api/alerts"/>
+      <label style="display:block;margin-top:12px;font-size:12px;color:var(--muted)">Token de Autorización</label>
+      <input id="token" name="token" class="input" placeholder="Bearer …"/>
+      <label style="display:block;margin-top:12px;font-size:12px;color:var(--muted)">Umbral Mínimo para Alerta **Media** (km²)</label>
+      <input id="thr" name="thresholdKm2" class="input" type="number" value="50" min="1" />
+      <p style="font-size:12px;color:var(--muted);margin-top:12px">Este valor define la severidad. Área $\ge$ Umbral = **Medio**. Área $\ge 2\times$ Umbral = **Alto**.</p>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+        <button type="submit" class="btn primary">Guardar y Cerrar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    // ======== CONFIGURACIÓN y ESTADO CENTRALIZADO ========
+    const CONFIG_DEFAULTS = { 
+      endpoint: '/api/alerts', 
+      token: '', 
+      thresholdKm2: 50,
+      initialCenter: [7.856272, 30.040413],
+      initialZoom: 5
+    };
+
+    let map, baseLight, markersLayer;
+    let chart;
+    let state = { 
+      alerts: [], 
+      timeseries: [],
+      // Cargar configuración de localStorage o usar defaults
+      config: JSON.parse(localStorage.getItem('dashboardConfig')) || CONFIG_DEFAULTS
+    };
+
+    // ======== Utilidades de Fechas y Formato ========
+    const sevColor = (s) => ({ low: '#8ecae6', medium: '#ffb703', high: '#d00000' }[s]);
+    const fmt = new Intl.NumberFormat('es-MX');
+    
+    const iso = (d) => d.toISOString().slice(0,10);
+    function dateRange(from, to){
+      const out = [];
+      const d0 = new Date(from + 'T00:00:00Z');
+      const d1 = new Date(to   + 'T00:00:00Z');
+      for(let d = new Date(d0); d <= d1; d.setDate(d.getDate()+1)){
+        out.push(iso(d));
+      }
+      return out;
+    }
+    
+    // ======== Lógica de la API Mock (Mejorada con Umbral Dinámico) ========
+    const SAMPLES = {
+      // ... Coordenadas sin cambios
+      "AOI1":   [[28.4030557946892,4.56031635161838]], "AOI2":   [[29.9750522870334,8.82296787706593]],
+      "AOI3":   [[33.5880207978216,9.91224608728714]], "AOI4":   [[32.798075235184,11.7848270241478]],
+      "AOI5":   [[27.3849398749753,8.75773248666496]], "AOI6":   [[32.5999999997002,4.38500000014994]],
+      "AOI7":   [[31.5150000002498,6.15000000039975]], "AOI8":   [[31.5900000000999,4.85000000029981]],
+      "AOI9":   [[33.6000000003997,4.68500000044969]], "AOI10":  [[28.4950000003497,9.67150000012497]]
+    };
+    
+    // Función de detección de riesgo simple (para el chart)
+    const calculateFloodRisk = (rain, alerts) => Math.min(10, Math.round(rain * 0.5 + alerts * 2));
+
+    async function fetchAlertsAPI(params){
+      await new Promise(r=>setTimeout(r,500)); // Simula latencia
+      
+      // Umbral dinámico cargado del estado (configurado por el usuario)
+      const threshold = Number(state.config.thresholdKm2) || 50; 
+      const highThreshold = threshold * 2;
+      
+      const rawAlerts = [
+        { id: 'AOI-1',  when: '2025-08-22T14:00:00Z', aoi: 'AOI1', areaKm2: 132.4, people: 18500, centroid: [4.56, 28.40] },
+        { id: 'AOI-2',  when: '2025-08-24T07:00:00Z', aoi: 'AOI2', areaKm2: 64.2,  people: 9200,  centroid: [8.82, 29.97] },
+        { id: 'AOI-3',  when: '2025-08-18T03:00:00Z', aoi: 'AOI3', areaKm2: 18.6,  people: 2100,  centroid: [9.91, 33.58] },
+        { id: 'AOI-4',  when: '2025-08-26T10:00:00Z', aoi: 'AOI4', areaKm2: 75.3,  people: 6400,  centroid: [11.78, 32.79] },
+        { id: 'AOI-5',  when: '2025-08-27T15:30:00Z', aoi: 'AOI5', areaKm2: 142.1, people: 23000, centroid: [8.75, 27.38] },
+        { id: 'AOI-6',  when: '2025-08-28T08:15:00Z', aoi: 'AOI6', areaKm2: 22.7,  people: 3500,  centroid: [4.38, 32.59] },
+        { id: 'AOI-7',  when: '2025-08-29T11:45:00Z', aoi: 'AOI7', areaKm2: 81.9,  people: 12000, centroid: [6.15, 31.51] },
+        { id: 'AOI-8',  when: '2025-08-30T09:20:00Z', aoi: 'AOI8', areaKm2: 190.5, people: 30000, centroid: [4.85, 31.59] },
+        { id: 'AOI-9',  when: '2025-08-31T04:50:00Z', aoi: 'AOI9', areaKm2: 28.6,  people: 4100,  centroid: [4.68, 33.60] },
+        { id: 'AOI-10', when: '2025-09-01T13:10:00Z', aoi: 'AOI10', areaKm2: 56.7, people: 8700,  centroid: [9.67, 28.49] }
+      ];
+
+      // Aplicar lógica de severidad dinámica
+      const alerts = rawAlerts.map(a => {
+        let severity;
+        if (a.areaKm2 >= highThreshold) {
+            severity = 'high';
+        } else if (a.areaKm2 >= threshold) {
+            severity = 'medium';
+        } else {
+            severity = 'low';
+        }
+        return { ...a, severity };
+      }).filter(a => params.aoi === 'Default' || a.aoi === params.aoi); // Filtrar por AOI
+
+      return { alerts };
+    }
+
+    // ======== Fusión lluvia + alertas + riesgo por día ========
+    function mergeSeriesWithAlerts(rainSeries, alerts){
+      const countByDay = {};
+      alerts.forEach(a=>{
+        // Normaliza a día UTC para el conteo
+        const d = new Date(a.when);
+        const day = iso(new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())));
+        countByDay[day] = (countByDay[day] || 0) + 1;
+      });
+      return rainSeries.map(r => {
+        const alertsCount = countByDay[r.date] || 0;
+        const risk = calculateFloodRisk(r.rain, alertsCount);
+        return { date:r.date, rain:r.rain, alerts: alertsCount, risk: risk };
+      });
+    }
+
+    // ======== Funciones de Configuración ========
+    const settingsDialog = document.getElementById('settings');
+
+    function populateSettingsDialog(){
+      document.getElementById('endpoint').value = state.config.endpoint;
+      document.getElementById('token').value = state.config.token;
+      document.getElementById('thr').value = state.config.thresholdKm2;
+    }
+
+    function saveSettings(event){
+      event.preventDefault(); // Detiene el cierre por defecto
+      const formData = new FormData(event.target);
+      const newConfig = {
+        endpoint: formData.get('endpoint'),
+        token: formData.get('token'),
+        // Asegura que el umbral es un número
+        thresholdKm2: Number(formData.get('thresholdKm2')) || CONFIG_DEFAULTS.thresholdKm2
+      };
+      
+      state.config = newConfig;
+      localStorage.setItem('dashboardConfig', JSON.stringify(newConfig));
+      
+      // Cierra el diálogo y recarga los datos con la nueva configuración
+      settingsDialog.close();
+      reload(); 
+    }
+
+    // ======== Renderizado ========
+    
+    function initMap(){
+      map = L.map('map', { zoomControl:true, attributionControl:true }).setView(state.config.initialCenter.reverse(), state.config.initialZoom);
+      baseLight = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom:19, attribution: '&copy; OpenStreetMap'
+      }).addTo(map);
+      markersLayer = L.layerGroup().addTo(map);
+
+      // Agregar la leyenda al mapa (ya está en el HTML, solo la hacemos visible si fuese necesario)
+      document.getElementById('mapLegend').style.display = 'block';
+    }
+
+    function renderAlerts(){
+      markersLayer.clearLayers();
+      state.alerts.forEach(a=>{
+        const r = Math.max(8, Math.min(20, Math.sqrt(a.areaKm2))); // Ajustar el tamaño del círculo
+        const marker = L.circleMarker(a.centroid.slice().reverse(), { 
+            radius:r, 
+            color:sevColor(a.severity), 
+            fillColor:sevColor(a.severity), 
+            fillOpacity:.6, 
+            weight:2 
+        });
+        const html = `
+          <div style="font-size:14px">
+          <b>${a.aoi} (${a.severity.toUpperCase()})</b><br/>
+          Área: ${a.areaKm2.toFixed(1)} km²<br/>
+          Población: ${fmt.format(a.people)}<br/>
+          Fecha: ${new Date(a.when).toLocaleString('es-MX')}
+          </div>
+        `;
+        marker.bindPopup(html);
+        markersLayer.addLayer(marker);
+      });
+    }
+    
+    function updateKPIs(){
+      const area = state.alerts.reduce((s,a)=>s+a.areaKm2,0);
+      const people = state.alerts.reduce((s,a)=>s+a.people,0);
+      const counts = state.alerts.reduce((acc,a)=>{acc[a.severity]++; return acc},{high:0,medium:0,low:0});
+      document.getElementById('kpiArea').textContent = `${Math.round(area).toLocaleString('es-MX')} km²`;
+      document.getElementById('kpiPeople').textContent = `${fmt.format(people)}`;
+      document.getElementById('kpiCounts').textContent = `${counts.high}/${counts.medium}/${counts.low}`;
+      document.getElementById('lastUpdate').textContent = new Date().toLocaleString('es-MX');
+    }
+    
+    function renderChart(){
+      const ctx = document.getElementById('tsChart').getContext('2d');
+      const labels = state.timeseries.map(d=>d.date);
+      const rain = state.timeseries.map(d=>d.rain);
+      const alerts = state.timeseries.map(d=>d.alerts);
+      const risk = state.timeseries.map(d=>d.risk); // Nuevo dataset
+      if(chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type:'bar',
+        data:{ labels, datasets:[
+          { type:'bar',  label:'Lluvia (mm)', data:rain,  yAxisID:'y',  borderWidth:0, backgroundColor: '#8ecae6' },
+          { type:'line', label:'Riesgo de Inundación', data:risk, yAxisID:'y1', borderColor: '#d00000', backgroundColor: 'rgba(208, 0, 0, 0.1)', fill:true, tension:.4, borderWidth:2, pointRadius:3 },
+          { type:'line', label:'# Alertas',  data:alerts, yAxisID:'y2', borderColor: '#117161', tension:.3, borderWidth:2, pointRadius:0, hidden:true }
+        ]},
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{ position:'top' }, tooltip:{ mode:'index', intersect:false } },
+          scales:{
+            y:{  position:'left',  title:{ display:true, text:'Lluvia (mm)' } },
+            y1:{ position:'right', grid:{ drawOnChartArea:false }, title:{ display:true, text:'Riesgo (0-10)' }, suggestedMax: 10, ticks:{stepSize:1} },
+            y2:{ position:'right', grid:{ drawOnChartArea:false }, title:{ display:true, text:'Alertas (#)' }, suggestedMax: Math.max(3, Math.max(...alerts)+1), hidden:true }
+          }
+        }
+      });
+    }
+    
+    function fillNotifications(){
+      const box = document.getElementById('notifList');
+      box.innerHTML = '';
+      const recentAlerts = state.alerts.sort((a,b) => new Date(b.when) - new Date(a.when)).slice(0, 8); // Mostrar solo las 8 más recientes
+      
+      if(recentAlerts.length === 0){
+        box.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">No se han detectado notificaciones en este período.</div>';
+        return;
+      }
+
+      recentAlerts.forEach(a=>{
+        const div = document.createElement('div');
+        div.className = 'notif';
+        const chipClass = a.severity === 'high' ? 'chip high' : a.severity === 'medium' ? 'chip medium' : 'chip low';
+        div.innerHTML = `
+          <div style="min-width:0; flex:1">
+            <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.aoi} (${a.areaKm2.toFixed(1)} km²)</div>
+            <div style="font-size:12px;color:var(--muted)">${new Date(a.when).toLocaleDateString('es-MX', {hour:'2-digit', minute:'2-digit'})}</div>
+          </div>
+          <span class="${chipClass}">${a.severity.toUpperCase()}</span>
+          <button class="btn ghost" data-lat="${a.centroid[1]}" data-lng="${a.centroid[0]}">Ver</button>
+        `;
+        div.querySelector('button').addEventListener('click', (e)=>{
+          const lat = parseFloat(e.target.getAttribute('data-lat'));
+          const lng = parseFloat(e.target.getAttribute('data-lng'));
+          map.flyTo([lat,lng], 10, { duration:.8 }); // Zoom más cercano (10)
+        });
+        box.appendChild(div);
+      });
+    }
+    
+    function fillTable(){
+      const tb = document.getElementById('alertsTable');
+      tb.innerHTML = '';
+      state.alerts.forEach(a=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><code>${a.id}</code></td>
+          <td>${new Date(a.when).toLocaleString('es-MX')}</td>
+          <td>${a.aoi}</td>
+          <td><span class="chip ${a.severity==='high'?'high':a.severity==='medium'?'medium':'low'}">${a.severity.toUpperCase()}</span></td>
+          <td>${a.areaKm2.toFixed(1)}</td>
+          <td>${fmt.format(a.people)}</td>
+          <td><button class="btn ghost" data-lat="${a.centroid[1]}" data-lng="${a.centroid[0]}">Zoom</button></td>
+        `;
+        tr.querySelector('button').addEventListener('click', (e)=>{
+          const lat = parseFloat(e.target.getAttribute('data-lat'));
+          const lng = parseFloat(e.target.getAttribute('data-lng'));
+          map.flyTo([lat,lng], 10, { duration:.8 });
+        });
+        tb.appendChild(tr);
+      });
+    }
+    
+    function exportCSV(){
+      const header = ['id','fecha_hora','aoi','severidad','area_km2','poblacion','lat','lng'];
+      const rows = state.alerts.map(a=>[a.id,a.when,a.aoi,a.severity,a.areaKm2,a.people,a.centroid[1],a.centroid[0]]); // Usar [lat, lng]
+      const csv = [header.join(','), ...rows.map(r=>r.map(v => (typeof v === 'string' && v.includes(',')) ? `"${v}"` : v).join(','))].join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `alerts_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+    
+    // ======== Control de Recarga ========
+    async function reload(){
+      document.getElementById('refresh').disabled = true;
+      const params = getParams();
+      try{
+        const [{ alerts }, rainSeries] = await Promise.all([
+          fetchAlertsAPI(params),
+          fetchOpenMeteoDaily(params.aoi, params.from, params.to)
+        ]);
+        state.alerts = alerts;
+        state.timeseries = mergeSeriesWithAlerts(rainSeries, alerts);
+    
+        renderAlerts(); 
+        updateKPIs(); 
+        renderChart(); 
+        fillNotifications(); 
+        fillTable();
+      }catch(err){
+        console.error('Error recargando datos', err);
+        // Manejo de fallback/errores de la API externa
+        if(!state.timeseries.length){
+          const days = dateRange(params.from, params.to);
+          state.timeseries = days.map(d=>({date:d, rain:0, alerts:0, risk:0}));
+          renderChart();
+        }
+      } finally {
+        document.getElementById('refresh').disabled = false;
+      }
+    }
+    
+    function getParams(){
+      const from = document.getElementById('from').value;
+      const to = document.getElementById('to').value;
+      const aoi = document.getElementById('aoi').value;
+      return { from, to, aoi, hazard:'flood' };
+    }
+    
+    // ======== Open-Meteo: precipitación diaria ERA5 (Sin Cambios) ========
+    async function fetchOpenMeteoDaily(aoi, from, to){
+      const points = aoi === 'Default' ? Object.values(SAMPLES).flat() : SAMPLES[aoi]; 
+      const qs = (lat,lon) =>
+        `https://archive-api.open-meteo.com/v1/era5?latitude=${lat}&longitude=${lon}`+
+        `&start_date=${from}&end_date=${to}&daily=precipitation_sum&timezone=auto`;
+      
+      const resps = await Promise.all(points.map(([lat,lon]) => fetch(qs(lat,lon)).then(r=>r.json())));
+      const days = dateRange(from, to);
+      const byDay = {};
+      days.forEach(d => byDay[d] = []);
+    
+      resps.forEach(j=>{
+        const dates = j?.daily?.time || [];
+        const vals  = j?.daily?.precipitation_sum || [];
+        dates.forEach((d, i)=>{
+          if(byDay[d]) byDay[d].push(Number(vals[i] ?? 0));
+        });
+      });
+    
+      return days.map(d=>{
+        const arr = byDay[d] ?? [];
+        const avg = arr.length ? arr.reduce((s,x)=>s+x,0)/arr.length : 0;
+        return { date:d, rain: Math.round(avg*10)/10 };
+      });
+    }
+
+    // ======== Inicialización (BOOT) ========
+    (function(){
+      // 1. Fechas por defecto (últimos 14 días)
+      const now = new Date();
+      const to = iso(now);
+      const from = iso(new Date(now.getTime()-13*86400000));
+      document.getElementById('from').value = from;
+      document.getElementById('to').value = to;
+      
+      // 2. Inicialización de UI y Datos
+      initMap();
+      populateSettingsDialog(); // Rellenar diálogo con la configuración cargada
+      reload();
+    
+      // 3. Event Listeners
+      document.getElementById('settingsForm').addEventListener('submit', saveSettings);
+      document.getElementById('refresh').addEventListener('click', reload);
+      document.getElementById('exportCsv').addEventListener('click', exportCSV);
+    
+      // Live refresh
+      const live = document.getElementById('live');
+      let timer = setInterval(()=> live.checked && reload(), 5*60*1000); // 5 minutos
+      live.addEventListener('change', ()=>{
+        clearInterval(timer);
+        if(live.checked){ timer = setInterval(()=> reload(), 5*60*1000); }
+      });
+    
+      // Recenter by aoi
+      document.getElementById('aoi').addEventListener('change', (e)=>{
+        const c = e.target.value;
+        const coords = SAMPLES[c];
+        if (coords) {
+            // Usar la primera coordenada de la AOI para centrar
+            map.flyTo(coords[0].slice().reverse(), 10, { duration:.8 });
+        } else {
+            // Default
+            map.flyTo(state.config.initialCenter.slice().reverse(), state.config.initialZoom);
+        }
+        reload();
+      });
+
+      // Settings button
+      document.getElementById('settingsBtn').addEventListener('click', ()=>{
+        populateSettingsDialog(); // Asegurar que el diálogo tenga los valores actuales
+        settingsDialog.showModal();
+      });
+    })();
+    </script>
+</body>
+</html>
