@@ -1,0 +1,512 @@
+{
+  "type": "FeatureCollection",
+  "name": "AOI_polygons_and_centroids",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "EPSG:4326"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "AOI1_polygon",
+      "properties": {
+        "aoi_id": "AOI1",
+        "kind": "polygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              28.22805579503898,
+              4.410316351918141
+            ],
+            [
+              28.22805579503898,
+              4.710316352217944
+            ],
+            [
+              28.57805579523881,
+              4.710316352217944
+            ],
+            [
+              28.57805579523881,
+              4.410316351918141
+            ],
+            [
+              28.22805579503898,
+              4.410316351918141
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI1_centroid",
+      "properties": {
+        "aoi_id": "AOI1",
+        "kind": "centroid"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          28.4030557946892,
+          4.56031635161838
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI2_polygon",
+      "properties": {
+        "aoi_id": "AOI2",
+        "kind": "polygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              29.60005228688357,
+              8.25599987089737
+            ],
+            [
+              29.60005228688357,
+              9.3899358832345
+            ],
+            [
+              30.35005228718336,
+              9.3899358832345
+            ],
+            [
+              30.35005228718336,
+              8.25599987089737
+            ],
+            [
+              29.60005228688357,
+              8.25599987089737
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI2_centroid",
+      "properties": {
+        "aoi_id": "AOI2",
+        "kind": "centroid"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          29.9750522870334,
+          8.82296787706593
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI3_polygon",
+      "properties": {
+        "aoi_id": "AOI3",
+        "kind": "polygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              33.3380207974219,
+              9.712246087686822
+            ],
+            [
+              33.3380207974219,
+              10.11224608778679
+            ],
+            [
+              33.83802079822129,
+              10.11224608778679
+            ],
+            [
+              33.83802079822129,
+              9.712246087686822
+            ],
+            [
+              33.3380207974219,
+              9.712246087686822
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI3_centroid",
+      "properties": {
+        "aoi_id": "AOI3",
+        "kind": "centroid"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          33.5880207978216,
+          9.91224608728714
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI4_polygon",
+      "properties": {
+        "aoi_id": "AOI4",
+        "kind": "polygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              32.54807523478433,
+              11.60982702359831
+            ],
+            [
+              32.54807523478433,
+              11.95982702379814
+            ],
+            [
+              33.0480752346844,
+              11.95982702379814
+            ],
+            [
+              33.0480752346844,
+              11.60982702359831
+            ],
+            [
+              32.54807523478433,
+              11.60982702359831
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI4_centroid",
+      "properties": {
+        "aoi_id": "AOI4",
+        "kind": "centroid"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.798075235184,
+          11.7848270241478
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI5_polygon",
+      "properties": {
+        "aoi_id": "AOI5",
+        "kind": "polygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.13493987457559,
+              8.557732487064698
+            ],
+            [
+              27.13493987457559,
+              8.957732487164606
+            ],
+            [
+              27.63493987537498,
+              8.957732487164606
+            ],
+            [
+              27.63493987537498,
+              8.557732487064698
+            ],
+            [
+              27.13493987457559,
+              8.557732487064698
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI5_centroid",
+      "properties": {
+        "aoi_id": "AOI5",
+        "kind": "centroid"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          27.3849398749753,
+          8.75773248666496
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI6_polygon",
+      "properties": {
+        "aoi_id": "AOI6",
+        "kind": "polygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              32.32999999970031,
+              4.119999999600338
+            ],
+            [
+              32.32999999970031,
+              4.649999999800173
+            ],
+            [
+              32.86999999970027,
+              4.649999999800173
+            ],
+            [
+              32.86999999970027,
+              4.119999999600338
+            ],
+            [
+              32.32999999970031,
+              4.119999999600338
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI6_centroid",
+      "properties": {
+        "aoi_id": "AOI6",
+        "kind": "centroid"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5999999997002,
+          4.38500000014994
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI7_polygon",
+      "properties": {
+        "aoi_id": "AOI7",
+        "kind": "polygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.13000000029984,
+              5.800000000199873
+            ],
+            [
+              31.13000000029984,
+              6.499999999700265
+            ],
+            [
+              31.9000000001999,
+              6.499999999700265
+            ],
+            [
+              31.9000000001999,
+              5.800000000199873
+            ],
+            [
+              31.13000000029984,
+              5.800000000199873
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI7_centroid",
+      "properties": {
+        "aoi_id": "AOI7",
+        "kind": "centroid"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          31.5150000002498,
+          6.15000000039975
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI8_polygon",
+      "properties": {
+        "aoi_id": "AOI8",
+        "kind": "polygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.47999999960035,
+              4.940000000299847
+            ],
+            [
+              31.69999999970025,
+              4.940000000299847
+            ],
+            [
+              31.69999999970025,
+              4.76000000029984
+            ],
+            [
+              31.47999999960035,
+              4.76000000029984
+            ],
+            [
+              31.47999999960035,
+              4.940000000299847
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI8_centroid",
+      "properties": {
+        "aoi_id": "AOI8",
+        "kind": "centroid"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          31.5900000000999,
+          4.85000000029981
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI9_polygon",
+      "properties": {
+        "aoi_id": "AOI9",
+        "kind": "polygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              33.44999999980018,
+              4.550000000000068
+            ],
+            [
+              33.44999999980018,
+              4.82000000000005
+            ],
+            [
+              33.75000000009999,
+              4.82000000000005
+            ],
+            [
+              33.75000000009999,
+              4.550000000000068
+            ],
+            [
+              33.44999999980018,
+              4.550000000000068
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI9_centroid",
+      "properties": {
+        "aoi_id": "AOI9",
+        "kind": "centroid"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          33.6000000003997,
+          4.68500000044969
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI10_polygon",
+      "properties": {
+        "aoi_id": "AOI10",
+        "kind": "polygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              28.36999999970027,
+              9.999999999900126
+            ],
+            [
+              28.62000000009999,
+              9.999999999900126
+            ],
+            [
+              28.62000000009999,
+              9.343000000349775
+            ],
+            [
+              28.36999999970027,
+              9.343000000349775
+            ],
+            [
+              28.36999999970027,
+              9.999999999900126
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AOI10_centroid",
+      "properties": {
+        "aoi_id": "AOI10",
+        "kind": "centroid"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          28.4950000003497,
+          9.67150000012497
+        ]
+      }
+    }
+  ]
+}
