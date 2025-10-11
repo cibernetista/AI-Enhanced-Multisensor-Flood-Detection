@@ -1,81 +1,273 @@
-/* VARIABLES REFINADAS para un look más profesional */
+/*
+  style.css — iOS 26 + Identidad ONU
+  Sofisticado · Elegante · Líquido (glass / blur / motion-friendly)
+  — Mantiene selectores existentes y añade utilidades iOS-like
+  — Paleta basada en “UN Blue” y grises neutros accesibles
+  — Soporte dark mode y high-contrast
+  --- MODIFICADO para transiciones más LÍQUIDAS ---
+*/
+
+/* ============================================
+   VARIABLES (tema claro)
+============================================ */
 :root{
-  --brand:#117161; /* Verde */
-  --accent-1:#d00000; /* Rojo/High */
-  --accent-2:#ffb703; /* Amarillo/Medium */
-  --accent-3:#8ecae6; /* Azul/Low */
-  
-  --bg:#f9fbfb;
-  --bg-soft:#f0f5f5;
-  --ink:#1a1c1d;
-  --card:#ffffff;
-  --muted:#6b7280;
-  --border:#e5e7eb;
-  --shadow:0 4px 12px rgba(0,0,0,.06);
-  
-  --radius:12px;
+  /* Identidad ONU */
+  --un-blue:#4C97D7;          /* UN Blue (aprox PMS 279) */
+  --un-blue-600:#2C7EC5;
+  --un-blue-700:#1E6BAC;
+  --un-accent:#00A3E0;        /* highlight líquido */
+
+  /* Semánticos */
+  --ok:#0E9F6E;
+  --warn:#EEB100;
+  --danger:#D7263D;
+
+  /* Neutros iOS-like */
+  --ink:#0B1220;              /* Texto primario */
+  --ink-soft:#4B5563;         /* Secundario */
+  --line:#E6EAF0;             /* Bordes finos */
+  --bg:#F7F9FC;               /* Fondo app */
+  --bg-soft:#EDF3FA;          /* Niebla suave */
+  --card:#FFFFFF;             /* Superficie */
+  --frost:rgba(255,255,255,.65);
+  --glass:rgba(255,255,255,.45);
+
+  /* Sombra y radios iOS */
+  --radius-8:12px;
+  --radius-16:20px;
+  --shadow-1:0 2px 8px rgba(10, 20, 30, .06);
+  --shadow-2:0 10px 30px rgba(10, 20, 30, .08);
+  --ring:0 0 0 3px rgba(76,151,215,.25);
+
+  /* Tipografía iOS */
+  --font-ui: ui-rounded, SF Pro Rounded, SF Pro Text, -apple-system, Segoe UI, Roboto, Inter, system-ui, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+  --size-0:12px; /* captions */
+  --size-1:14px; /* body */
+  --size-2:16px; /* body+ */
+  --size-3:18px; /* subtitle */
+  --size-4:22px; /* title */
+  --size-5:28px; /* large title */
 }
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px}
-.app-bg{background:
-  radial-gradient(circle at 10% 5%, var(--bg-soft) 0, transparent 20%),
-  radial-gradient(circle at 90% 0%, var(--bg-soft) 0, transparent 30%)
+
+/* ============================================
+   RESET / BASE
+============================================ */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-ui);
+  font-size:var(--size-1);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
+
+.app-bg{
+  background:
+    radial-gradient(1200px 400px at 10% -10%, var(--bg-soft) 0%, transparent 60%),
+    radial-gradient(800px 300px at 95% -20%, rgba(76,151,215,.12) 0%, transparent 70%);
+}
+
+/* ============================================
+   CABECERA (sticky + glass)
+============================================ */
 header{
-  position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.8);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:50;
+  background:var(--glass);
+  -webkit-backdrop-filter:saturate(180%) blur(16px);
+  backdrop-filter:saturate(180%) blur(16px);
+  border-bottom:1px solid var(--line);
 }
 .wrap{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center}
-.title{font-weight:700;font-size:22px;color:var(--brand)}
-.badge{background:var(--brand);color:#fff;border-radius:999px;padding:2px 10px;font-size:12px;margin-left:8px;font-weight:600}
+.title{font-weight:800;font-size:var(--size-4);letter-spacing:.1px;color:var(--un-blue)}
+.badge{background:var(--un-blue);color:#fff;border-radius:999px;padding:4px 12px;font-size:var(--size-0);font-weight:700;box-shadow:var(--shadow-1)}
 .grow{flex:1}
-.btn{
-  border:1px solid var(--border);background:#fff;border-radius:8px;padding:8px 12px;font-weight:500;cursor:pointer;
-  transition:background 0.2s, border-color 0.2s;
-}
-.btn.primary{background:var(--brand);color:#fff;border-color:transparent}
-.btn.primary:hover{background:#0e5a4d}
-.btn.ghost{background:transparent;border-color:transparent}
-.btn:disabled{opacity:.6;cursor:not-allowed}
-.input, select{height:38px;border:1px solid var(--border);border-radius:8px;padding:0 10px;background:#fff}
-.switch{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
 
+/* ============================================
+   BOTONES (iOS pills)
+============================================ */
+.btn{
+  --bg-btn:#fff; --fg-btn:var(--ink); --bd:var(--line);
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--bd);background:var(--bg-btn);
+  color:var(--fg-btn);border-radius:999px;padding:10px 14px;
+  font-weight:600;line-height:1;cursor:pointer;
+  box-shadow:var(--shadow-1);
+  /* Transición más fluida para efecto líquido */
+  transition:transform .12s cubic-bezier(.2, .8, .5, 1), box-shadow .2s ease, background .2s ease, border-color .2s ease;
+}
+.btn:hover{box-shadow:var(--shadow-2)}
+/* Efecto active más sutil (scale) para un toque moderno y elegante */
+.btn:active{transform:scale(0.98); box-shadow:var(--shadow-1)}
+.btn:focus-visible{outline:none;box-shadow:var(--ring)}
+.btn.primary{--bg-btn:linear-gradient(180deg, var(--un-blue) 0%, var(--un-blue-600) 100%); --fg-btn:#fff; --bd:transparent}
+.btn.primary:hover{filter:saturate(110%)}
+.btn.ghost{background:transparent;border-color:transparent;box-shadow:none}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+
+/* Icon pills */
+.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(76,151,215,.12);color:var(--un-blue);font-weight:700}
+
+/* Inputs iOS */
+.input, select{
+  height:40px;border:1px solid var(--line);border-radius:12px;padding:0 12px;background:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6), var(--shadow-1);
+}
+.input:focus, select:focus{outline:none;border-color:var(--un-blue);box-shadow:var(--ring)}
+
+/* Switch / Toggle */
+.switch{display:inline-flex;align-items:center;gap:10px;font-size:var(--size-1);color:var(--ink-soft)}
+.toggle{position:relative;width:48px;height:28px;background:#E5EDF7;border-radius:999px;border:1px solid var(--line);transition:all .2s ease;box-shadow:inset 0 2px 6px rgba(0,0,0,.06)}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.15);transition:all .2s ease}
+.toggle.on{background:linear-gradient(180deg,var(--un-blue),var(--un-blue-700));border-color:transparent}
+.toggle.on::after{left:23px}
+
+/* Segmented control */
+.segmented{display:inline-flex;padding:4px;border-radius:999px;background:rgba(76,151,215,.10);border:1px solid rgba(76,151,215,.25);box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+.segmented button{background:transparent;border:0;padding:8px 14px;border-radius:999px;font-weight:700;color:var(--un-blue)}
+.segmented button.active{background:#fff;box-shadow:var(--shadow-1)}
+
+/* ============================================
+   LAYOUT
+============================================ */
 main{max-width:1200px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:2.2fr 1fr;gap:24px}
 @media (max-width: 960px){ main{grid-template-columns:1fr;gap:16px} }
 
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-.card h3{margin:0;padding:14px;border-bottom:1px solid var(--border);font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px}
-.card .content{padding:14px}
-
-/* Map */
-#map{width:100%;height:480px;border-radius:0 0 var(--radius) var(--radius)}
-/* Leyenda mejorada */
-.legend{
-  position:absolute; right:12px; top:12px; z-index:400; background:#fff; 
-  border:1px solid var(--border); border-radius:8px; padding:10px; font-size:13px; box-shadow:0 1px 4px rgba(0,0,0,.1);
+/* ============================================
+   CARDS (frosted)
+============================================ */
+.card{background:var(--frost);border:1px solid var(--line);border-radius:var(--radius-16);box-shadow:var(--shadow-2);
+  -webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px);
 }
-.legend div{display:flex;align-items:center;margin-bottom:4px}
+.card h3{margin:0;padding:16px 16px 12px;border-bottom:1px solid var(--line);font-size:var(--size-2);font-weight:800;display:flex;align-items:center;gap:10px;color:var(--ink)}
+.card .content{padding:16px}
+
+/* ============================================
+   MAPA + LEYENDA (elevadas)
+============================================ */
+#map{width:100%;height:520px;border-radius:0 0 var(--radius-16) var(--radius-16);overflow:hidden}
+.legend{
+  position:absolute; right:12px; top:12px; z-index:400; background:var(--frost);
+  border:1px solid var(--line); border-radius:14px; padding:12px; font-size:13px; box-shadow:var(--shadow-2);
+  -webkit-backdrop-filter:saturate(180%) blur(16px);backdrop-filter:saturate(180%) blur(16px);
+}
+.legend div{display:flex;align-items:center;margin-bottom:6px}
+.legend div:last-child{margin-bottom:0}
 .dot{width:12px;height:12px;border-radius:999px;display:inline-block;margin-right:8px}
 
-/* KPI */
+/* ============================================
+   KPI (grilla adaptable)
+============================================ */
 .kpis{display:grid;grid-template-columns:repeat(3, 1fr);gap:16px}
-@media (max-width: 520px){ .kpis{grid-template-columns:1fr} }
-.kpi .big{font-size:28px;font-weight:700;margin-top:2px}
-.kpi .muted{font-size:13px;color:var(--muted)}
+@media (max-width: 640px){ .kpis{grid-template-columns:1fr} }
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow-1)}
+.kpi .big{font-size:30px;font-weight:800;margin-top:2px;letter-spacing:.2px}
+.kpi .muted{font-size:13px;color:var(--ink-soft)}
 
-/* Alerts list */
-.notif{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+/* ============================================
+   ALERTAS (chips ONU)
+============================================ */
+.notif{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .notif:last-child{border-bottom:none;padding-bottom:0}
-.chip{border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;line-height:1}
-.chip.high{background:var(--accent-1);color:#fff;}
-.chip.medium{background:#fef3c7;color:#92400e;}
-.chip.low{background:#eff6ff;color:#1e40af;}
+.chip{border-radius:999px;padding:6px 12px;font-size:12px;font-weight:800;line-height:1;letter-spacing:.2px}
+.chip.high{background:linear-gradient(180deg, #D7263D 0%, #B01E31 100%);color:#fff;}
+.chip.medium{background:#FFF3CD;color:#7A5B00;border:1px solid #F3E1A1;}
+.chip.low{background:#EAF4FF;color:#164E8B;border:1px solid #D2E8FF;}
 
-/* Table */
-table{width:100%;border-collapse:collapse;font-size:14px}
-th{font-weight:600}
-th,td{border-bottom:1px solid var(--border);padding:10px 8px;text-align:left}
-tbody tr:hover{background:#f9fafb}
+/* ============================================
+   TABLAS
+============================================ */
+table{width:100%;border-collapse:separate;border-spacing:0 6px;font-size:14px}
+th{font-weight:800;color:var(--ink-soft);text-transform:uppercase;font-size:12px;letter-spacing:.8px}
+th,td{padding:12px 12px}
+tbody tr{
+    background:var(--card); /* Usar variable para consistencia de tema */
+    border:1px solid var(--line);
+    /* Transición añadida para efectos líquidos en hover/active */
+    transition: box-shadow .2s ease, background .2s ease, border-color .2s ease;
+}
+tbody tr:hover{
+    box-shadow:var(--shadow-2); /* Sombra más pronunciada en hover (elevación) */
+    background:var(--bg-soft); /* Cambio de fondo sutil */
+    border-color:rgba(76,151,215,.3); /* Tinta sutil del azul ONU en borde */
+}
+tbody tr:first-child td:first-child{border-top-left-radius:12px}
+tbody tr:first-child td:last-child{border-top-right-radius:12px}
+tbody tr:last-child td:first-child{border-bottom-left-radius:12px}
+tbody tr:last-child td:last-child{border-bottom-right-radius:12px}
 
-/* Dialog */
-dialog{border:none;border-radius:16px;width:min(520px,90%);padding:20px;}
-dialog::backdrop{background:rgba(0,0,0,.4)}
-dialog h3{font-size:18px;margin-bottom:12px}
+/* ============================================
+   DIÁLOGO
+============================================ */
+dialog{border:none;border-radius:24px;width:min(560px,92%);padding:0;background:var(--frost);box-shadow:var(--shadow-2);
+  -webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px);
+}
+dialog::backdrop{background:rgba(8,16,24,.45)}
+dialog h3{font-size:20px;margin:0;padding:18px 20px;border-bottom:1px solid var(--line);font-weight:800}
+dialog .content{padding:18px 20px}
+
+/* ============================================
+   UTILIDADES (espaciados, helpers)
+============================================ */
+.m-0{margin:0}.mt-8{margin-top:8px}.mt-16{margin-top:16px}.mt-24{margin-top:24px}
+.p-0{padding:0}.p-8{padding:8px}.p-12{padding:12px}.p-16{padding:16px}
+.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}
+.text-muted{color:var(--ink-soft)}
+
+/* ============================================
+   ESTADOS (focus / active)
+============================================ */
+:focus-visible{outline:none;box-shadow:var(--ring)}
+
+/* ============================================
+   DARK MODE
+============================================ */
+@media (prefers-color-scheme: dark){
+  :root{
+    --ink:#E8EEF6; --ink-soft:#A7B4C7;
+    --bg:#0B1220; --bg-soft:#0F1A2B; --card:#0F1626;
+    --frost:rgba(18,26,44,.65); --glass:rgba(18,26,44,.45);
+    --line:rgba(255,255,255,.10);
+    --shadow-1:0 2px 8px rgba(0,0,0,.5);
+    --shadow-2:0 20px 40px rgba(0,0,0,.55);
+  }
+  header{border-bottom-color:var(--line)}
+  .btn{--bg-btn:#101827; --fg-btn:#E8EEF6; --bd:var(--line)}
+  .btn.primary{--bg-btn:linear-gradient(180deg, var(--un-blue-600), var(--un-blue-700));}
+  .input, select{background:#0F1626;color:var(--ink);border-color:var(--line)}
+  .card, .legend, dialog{border-color:var(--line)}
+  tbody tr{background:var(--card);border-color:var(--line)}
+}
+
+/* ============================================
+   REDUCCIÓN DE MOVIMIENTO
+============================================ */
+@media (prefers-reduced-motion: reduce){
+  *{transition:none!important;animation:none!important}
+}
+
+/* ============================================
+   COMPAT: Mantener algunos nombres heredados
+   (del CSS original del usuario)
+============================================ */
+:root{
+  /* Mapear variables antiguas a nuevas */
+  --brand: var(--un-blue);
+  --accent-1: var(--danger);
+  --accent-2: var(--warn);
+  --accent-3: #8ecae6; /* fallback */
+  --bg-legacy: var(--bg);
+  --bg-soft-legacy: var(--bg-soft);
+  --border: var(--line);
+  --shadow: var(--shadow-1);
+  --radius: var(--radius-16);
+}
+
+/* Clases originales – estilo actualizado */
+.btn.primary:hover{background:var(--bg-btn)} /* ya cubierto por gradients */
+.badge, .chip{user-select:none}
+
+/* Esquinas del mapa si va dentro de .card */
+.card > #map{border-top-left-radius:0;border-top-right-radius:0}
